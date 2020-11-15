@@ -74,7 +74,7 @@ pipeline {
                         //  docker.image("${registry}:23").inside("-it --rm -e API_KEY= -p 80:80 --name gotest --entrypoint=''"){
                         //      sh './main'
                         //  }
-                        sh "docker run --rm -e API_KEY=1428953537:AAGXZr4wTMQAUCvjZnyo1-nbEf5QDsT3j3w -p 80:80 --name gotest ${registry}:23"
+                        sh "docker run --rm -e API_KEY= -p 80:80 --name gotest ${registry}:23"
                     } catch(ex){
                         print(ex)
                     }
