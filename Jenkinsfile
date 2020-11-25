@@ -27,7 +27,7 @@ pipeline {
                     def dockerHome = tool 'myDocker'
                     env.PATH = "${dockerHome}/bin:${env.PATH}"
 
-                    def myDocker = docker.build("TelegramBot/${registry}:${env.BUILD_ID}")
+                    def myDocker = docker.build("${registry}:${env.BUILD_ID}", ".")
                     docker.withRegistry('', registryCredential ) {
                         myDocker.push()
                     }
