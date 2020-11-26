@@ -9,10 +9,11 @@ from multiprocessing import Process
 logging.basicConfig(filename="sample.log", level=logging.INFO)
 
 bot = telebot.TeleBot(os.environ['API_KEY'])
+target = telebot.TeleBot(os.environ['API_KEY_TARGET'])
 
 test_message = 'test {}'.format(uuid.uuid4())
 
-test_chat_id = 501631688
+test_chat_id = target
 
 
 def send_message():
@@ -25,6 +26,8 @@ def send_message():
 def send_text(message):
     if message.text.lower() == test_message:
         logging.debug('OK', message.text)
+    else:
+        logging.debug('OTHER', message.text)
 
 
 if __name__ == '__main__':

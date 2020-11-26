@@ -17,6 +17,7 @@ pipeline {
         registry = 'paleontolog/go_bot'
         registryCredential = 'dockerhub'
         apikey = credentials('apikey')
+        apikeychecker = credentials('apikeychecker')
     }
 
     stages {
@@ -52,28 +53,16 @@ pipeline {
 //                 script {
 //                     try {
 //                         withDockerNetwork{ n ->
-//                             docker.image("${registry}:23").withRun("--network ${n} -e ${apikey} --name gotest") { c ->
-//                               docker.image('curlimages/curl').inside("""--network ${n} --entrypoint=''""") {
-
-//                                     sh '''
-//                                         set +x;
-//                                          x=0;
-//                                          while [ $x -lt 100 ] && ! curl gotest:8080/-_-api/v1/hello  --output /dev/null;
-//                                          do
-//                                             x=$(( $x + 1 ));
-//                                             sleep 1;
-//                                          done
-//                                     '''
-
+//                             docker.image("${registry}:${env.BUILD_ID}").withRun("--network ${n} -e ${apikey} --name gotest") { c ->
+//                               docker.image('paleontolog/bot_checker').inside("""--network ${n} -e ${apikeychecker}""") {
 //                                     def response = sh(
 //                                         script: '''
-//                                             $(curl --write-out '%{http_code}' \
-//                                                 --silent --output /dev/null gotest:8080)
+//                                             sleep 5 && $(cat ./sample.log)
 //                                         ''',
 //                                         returnStdout: true).trim()
 //                                     print(response)
 
-//                                     assert response == '200'
+//                                     // assert response == '200'
 //                               }
 //                             }
 //                         }
@@ -82,8 +71,8 @@ pipeline {
 //                     }
 //                 }
 //             }
-//   }
-
+//         }
+//     }
         stage('Pull container') {
             steps {
                 script {
@@ -95,7 +84,7 @@ pipeline {
                 }
             }
         }
-    }
+
     post {
         always {
             script {
@@ -108,3 +97,4 @@ pipeline {
         }
     }
 }
+
