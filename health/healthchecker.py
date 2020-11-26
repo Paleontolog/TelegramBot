@@ -1,13 +1,14 @@
 import time
 import uuid
 import logging
+import os
 
 import telebot
 from multiprocessing import Process
 
 logging.basicConfig(filename="sample.log", level=logging.INFO)
 
-bot = telebot.TeleBot('1428953537:AAGXZr4wTMQAUCvjZnyo1-nbEf5QDsT3j3w')
+bot = telebot.TeleBot(os.environ['API_KEY'])
 
 test_message = 'test {}'.format(uuid.uuid4())
 
