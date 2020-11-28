@@ -32,14 +32,14 @@ func main() {
 
 	for update := range updates {
 
-		if update.Message == nil {
+		if update.ChannelPost.Text == "" {
 			continue
 		}
 
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		log.Printf("[%s] %s", update.ChannelPost.From, update.ChannelPost.Text)
 
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
+		msg := tgbotapi.NewMessage(update.ChannelPost.Chat.ID, update.ChannelPost.Text)
+		msg.ReplyToMessageID = update.ChannelPost.MessageID
 
 		_, _ = bot.Send(msg)
 	}
