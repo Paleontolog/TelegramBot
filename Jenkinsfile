@@ -18,6 +18,7 @@ pipeline {
         registryCredential = 'dockerhub'
         apikey = credentials('apikey')
         apikeychecker = credentials('apikeychecker')
+        chatid = credentials('chatid')
     }
 
     stages {
@@ -48,43 +49,34 @@ pipeline {
             }
         }
 
-//   stage('Pull container') {
-//             steps {
-//                 script {
-//                     try {
-//                         withDockerNetwork{ n ->
-//                             docker.image("${registry}:${env.BUILD_ID}").withRun("--network ${n} -e ${apikey} --name gotest") { c ->
-//                               docker.image('paleontolog/bot_checker').inside("""--network ${n} -e ${apikeychecker}""") {
-//                                     def response = sh(
-//                                         script: '''
-//                                             sleep 5 && $(cat ./sample.log)
-//                                         ''',
-//                                         returnStdout: true).trim()
-//                                     print(response)
-
-//                                     // assert response == '200'
-//                               }
-//                             }
-//                         }
-//                     } catch(ex){
-//                         print(ex)
-//                     }
-//                 }
-//             }
-//         }
-//     }
         stage('Pull container') {
             steps {
                 script {
                     try {
-                        sh "docker run -d -e ${apikey} -p 80:80 --name gotest ${registry}:${env.BUILD_ID}"
-                    } catch (ex) {
+                        withDockerNetwork{ n ->
+                            docker.image("${registry}:${env.BUILD_ID}").withRun("--network ${n} -e ${apikey} --name gotest") { c ->
+                              docker.image('paleontolog/bot_checker').withRun("""--network ${n} \\
+                                           -v '$PWD':/root/ -e ${apikeychecker} -e ${chatid}""") { e ->
+                                    sh 'ls'
+                                    sleep(10)
+                                    def response = sh(
+                                        script: '''
+                                            $(cat sample.log | grep OK)
+                                        ''',
+                                        returnStdout: true)
+                                    print(response)
+
+                                    // assert response == '200'
+                              }
+                            }
+                        }
+                    } catch(ex) {
                         print(ex)
                     }
                 }
             }
         }
-
+    }
     post {
         always {
             script {
