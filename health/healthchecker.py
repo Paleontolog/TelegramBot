@@ -6,7 +6,7 @@ import os
 import telebot
 from multiprocessing import Process
 
-logging.basicConfig(filename="logs/sample.log", level=logging.INFO)
+logging.basicConfig(filename="sample.log", level=logging.INFO)
 
 bot = telebot.TeleBot(os.environ['API_KEY'])
 

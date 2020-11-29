@@ -54,24 +54,23 @@ pipeline {
                 script {
                     try {
                         withDockerNetwork{ n ->
-                            docker.image("${registry}:${env.BUILD_ID}").withRun("--network ${n} -e ${apikey} --name gotest") { c ->
-                              docker.image('paleontolog/bot_checker').withRun("""--network ${n} \\
-                                           -v '$PWD':/root/ -e ${apikeychecker} -e ${chatid}""") { e ->
-                                    sh 'ls'
+                           docker.image("${registry}:${env.BUILD_ID}").withRun("--network ${n} -e ${apikey} --name gobot") { c ->
+                              docker.image('paleontolog/bot_checker').withRun("""--network ${n} -e ${apikeychecker} -e ${chatid} --name testgobot""") { e ->
                                     sleep(10)
+                                    sh 'docker cp testgobot:/root/sample.log .'
+                                
                                     def response = sh(
-                                        script: '''
-                                            $(cat sample.log | grep OK)
-                                        ''',
-                                        returnStdout: true)
+                                        script: "grep -c OK sample.log",
+                                        returnStdout: true).trim()
+                                    
                                     print(response)
-
-                                    // assert response == '200'
+                                    assert response != '0'
+                                    sh 'rm -rf sample.log'
                               }
                             }
                         }
                     } catch(ex) {
-                        print(ex)
+                       print(ex)
                     }
                 }
             }
